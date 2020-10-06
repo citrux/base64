@@ -28,3 +28,5 @@ Then check the [examples](examples).
     - [x] handle errors
     - [ ] error messages
     - [ ] write comments (especially, in src/base64.h)
+- [ ] add c++ support (extern C)
+- [ ] add benchmark
