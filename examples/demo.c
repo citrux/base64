@@ -15,14 +15,20 @@ int main(int argc, char *argv[]) {
     char *output = calloc(out_len+1, sizeof(char));
     memset(output, 0, out_len+1);
 
-    encode(input, strlen(input), output);
+    if (encode(input, strlen(input), output) == -1) {
+        puts("Encoding failed!");
+        exit(1);
+    }
     puts(output);
 
     int out1_len = get_decoded_length(strlen(input));
     char *output1 = calloc(out1_len+1, sizeof(char));
     memset(output1, 0, out1_len+1);
 
-    decode(output, strlen(output), output1);
+    if (decode(output, strlen(output), output1) == -1) {
+        puts("Decoding failed!");
+        exit(1);
+    }
     puts(output1);
     return 0;
 }

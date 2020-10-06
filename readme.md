@@ -25,5 +25,6 @@ Then check the [examples](examples).
 ### todo
 
 - [ ] improve code
-    - [ ] handle errors
+    - [x] handle errors
+    - [ ] error messages
     - [ ] write comments (especially, in src/base64.h)
