@@ -20,7 +20,7 @@ int8_t get_alphabet_index(char symbol) {
 }
 
 uint32_t get_encoded_length(uint32_t data_len) {
-  return data_len + (data_len + 2) / 3;
+  return (data_len + 2) / 3 * 4;
 }
 
 uint32_t get_decoded_length(uint32_t data_len) {
