@@ -33,7 +33,7 @@ int encode(const char *input, uint32_t input_length, char *output) {
   uint32_t read_position = 0;
   uint32_t write_position = 0;
   while (read_position < input_length) {
-    char chunk = input[read_position++];
+    uint8_t chunk = input[read_position++];
     buffer |= chunk >> bits_in_buffer;
     char c = get_alphabet_symbol(buffer >> 2);
     if (c == -1) {
