@@ -29,4 +29,4 @@ Then check the [examples](examples).
     - [ ] error messages
     - [ ] write comments (especially, in src/base64.h)
 - [ ] add c++ support (extern C)
-- [ ] add benchmark
+- [x] add benchmark
