@@ -13,6 +13,9 @@ if(COMPILE_EXAMPLES)
     add_executable(demo examples/demo.c)
     target_link_libraries(demo base64)
 
+    add_executable(binary examples/binary.c)
+    target_link_libraries(binary base64)
+
     add_executable(bench examples/bench.c)
     target_link_libraries(bench base64)
 endif()
