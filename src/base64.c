@@ -23,39 +23,29 @@ uint32_t get_encoded_length(uint32_t data_len) {
   return (data_len + 2) / 3 * 4;
 }
 
-uint32_t get_decoded_length(uint32_t data_len) {
-  return data_len - (data_len + 3) / 4;
-}
+uint32_t get_decoded_length(uint32_t data_len) { return data_len * 3 / 4; }
 
 int encode(const char *input, uint32_t input_length, char *output) {
-  uint8_t buffer = 0;
   uint8_t bits_in_buffer = 0;
+  uint16_t buffer = 0;
   uint32_t read_position = 0;
   uint32_t write_position = 0;
-  while (read_position < input_length) {
-    uint8_t chunk = input[read_position++];
-    buffer |= chunk >> bits_in_buffer;
-    char c = get_alphabet_symbol(buffer >> 2);
+  while (read_position < input_length || bits_in_buffer >= 6) {
+    if (bits_in_buffer < 6) {
+      uint16_t chunk = (uint8_t)input[read_position++];
+      buffer |= chunk << (8 - bits_in_buffer);
+      bits_in_buffer += 8;
+    }
+    char c = get_alphabet_symbol(buffer >> 10);
     if (c == -1) {
       return -1;
     }
     output[write_position++] = c;
     buffer <<= 6;
-    buffer |= (chunk & ((1 << (8 - bits_in_buffer)) - 1))
-              << (6 - bits_in_buffer);
-    bits_in_buffer += 2;
-    if (bits_in_buffer == 6) {
-      char c = get_alphabet_symbol(buffer >> 2);
-      if (c == -1) {
-        return -1;
-      }
-      output[write_position++] = c;
-      buffer = 0;
-      bits_in_buffer = 0;
-    }
+    bits_in_buffer -= 6;
   }
   if (bits_in_buffer) {
-    char c = get_alphabet_symbol(buffer >> 2);
+    char c = get_alphabet_symbol(buffer >> 10);
     if (c == -1) {
       return -1;
     }
@@ -73,54 +63,36 @@ int encode(const char *input, uint32_t input_length, char *output) {
       break;
     }
   }
-  return 0;
+  return write_position;
 }
 
 int decode(const char *input, uint32_t input_length, char *output) {
+  uint8_t bits_in_buffer = 0;
+  uint16_t buffer = 0;
   uint32_t read_position = 0;
   uint32_t write_position = 0;
   while (read_position < input_length) {
-    char c = input[read_position];
-    uint8_t i = get_alphabet_index(c);
-    if (i == (uint8_t)-1) {
-      return -1;
+    if (bits_in_buffer < 8) {
+      char c = input[read_position++];
+      if (c == '=') {
+        bits_in_buffer = 0;
+        break;
+      }
+      uint8_t i = get_alphabet_index(c);
+      if (i == (uint8_t)-1) {
+        return -1;
+      }
+      uint16_t chunk = i;
+      buffer |= chunk << (10 - bits_in_buffer);
+      bits_in_buffer += 6;
+    } else {
+      output[write_position++] = buffer >> 8;
+      buffer <<= 8;
+      bits_in_buffer -= 8;
     }
-    output[write_position] = i << 2;
-
-    read_position += 1;
-    c = input[read_position];
-    i = get_alphabet_index(c);
-    if (i == (uint8_t)-1) {
-      return -1;
-    }
-    output[write_position] |= i >> 4;
-    write_position += 1;
-    output[write_position] = i << 4;
-
-    read_position += 1;
-    c = input[read_position];
-    if (c == '=') {
-      return 0;
-    }
-    i = get_alphabet_index(c);
-    if (i == (uint8_t)-1) {
-      return -1;
-    }
-    output[write_position] |= i >> 2;
-    write_position += 1;
-    output[write_position] = i << 6;
-
-    read_position += 1;
-    c = input[read_position];
-    if (c == '=') {
-      return 0;
-    }
-    i = get_alphabet_index(c);
-    if (i == (uint8_t)-1) {
-      return -1;
-    }
-    output[write_position++] |= i;
-    read_position += 1;
   }
-  return 0;
+  if (bits_in_buffer) {
+    output[write_position++] = buffer >> 8;
+  }
+  return write_position;
 }
