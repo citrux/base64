@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
   char *input = argv[1];
 
   int out_len = get_encoded_length(strlen(input));
+  printf("input length: %lu, encoded length: %d\n", strlen(input), out_len);
   char *output = calloc(out_len + 1, sizeof(char));
   memset(output, 0, out_len + 1);
 
@@ -21,15 +22,17 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
   puts(output);
-
-  int out1_len = get_decoded_length(strlen(input));
+  int out1_len = get_decoded_length(out_len);
   char *output1 = calloc(out1_len + 1, sizeof(char));
   memset(output1, 0, out1_len + 1);
 
-  if (decode(output, strlen(output), output1) == -1) {
+  out1_len = decode(output, strlen(output), output1);
+  if (out1_len == -1) {
     puts("Decoding failed!");
     exit(1);
   }
+  printf("decoded length: %d\n", out1_len);
+
   puts(output1);
   return 0;
 }
