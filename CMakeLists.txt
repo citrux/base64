@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name
-project(base64)
+project(base64 VERSION 0.1.0)
 
 # add the library and specify its include directories
 add_library(base64 src/base64.c)
