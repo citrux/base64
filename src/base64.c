@@ -66,32 +66,29 @@ int encode(const char *input, uint32_t input_length, char *output) {
 }
 
 int decode(const char *input, uint32_t input_length, char *output) {
-  uint8_t bits_in_buffer = 0;
-  uint16_t buffer = 0;
-  uint32_t read_position = 0;
-  uint32_t write_position = 0;
-  while (read_position < input_length) {
-    if (bits_in_buffer < 8) {
-      char c = input[read_position++];
-      if (c == '=') {
-        bits_in_buffer = 0;
-        break;
-      }
-      uint8_t i = get_alphabet_index(c);
-      if (i == (uint8_t)-1) {
-        return -1;
-      }
-      uint16_t chunk = i;
-      buffer |= chunk << (10 - bits_in_buffer);
-      bits_in_buffer += 6;
-    } else {
-      output[write_position++] = buffer >> 8;
-      buffer <<= 8;
-      bits_in_buffer -= 8;
-    }
+  while(input[input_length-1] == '=') { input_length -= 1;}
+  for (int read_position = 0; read_position < input_length - 3; read_position += 4) {
+    uint32_t buffer = 0;
+    buffer |= get_alphabet_index(input[read_position]) << 18;
+    buffer |= get_alphabet_index(input[read_position+1]) << 12;
+    buffer |= get_alphabet_index(input[read_position+2]) << 6;
+    buffer |= get_alphabet_index(input[read_position+3]);
+
+    int write_position = read_position / 4 * 3;
+    output[write_position++] = (uint8_t)(buffer >> 16);
+    output[write_position++] = (uint8_t)(buffer >> 8);
+    output[write_position++] = (uint8_t)buffer;
   }
-  if (bits_in_buffer) {
-    output[write_position++] = buffer >> 8;
+  int write_position = input_length / 4 * 3;
+  switch (input_length % 4){
+    case 2:
+      output[write_position++] = (get_alphabet_index(input[input_length-2]) << 2) + (get_alphabet_index(input[input_length-1]) >> 4);
+      break;
+    case 3:
+      output[write_position++] = (get_alphabet_index(input[input_length-3]) << 2) + (get_alphabet_index(input[input_length-2]) >> 4);
+      output[write_position++] = (get_alphabet_index(input[input_length-2]) << 4) + (get_alphabet_index(input[input_length-1]) >> 2);
+    break;
+    default: break;
   }
   return write_position;
 }
