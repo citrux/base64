@@ -33,7 +33,8 @@ uint32_t get_encoded_length(uint32_t data_len) {
 uint32_t get_decoded_length(uint32_t data_len) { return data_len * 3 / 4; }
 
 int encode(const char *input, uint32_t input_length, char *output) {
-  for (int read_position = 0; read_position < input_length - 2; read_position += 3) {
+  for (int read_position = 0; read_position + 2 < input_length;
+       read_position += 3) {
     uint32_t buffer = 0;
     buffer |= ((uint8_t)input[read_position]) << 16;
     buffer |= ((uint8_t)input[read_position + 1]) << 8;
@@ -46,33 +47,42 @@ int encode(const char *input, uint32_t input_length, char *output) {
     output[write_position++] = get_alphabet_symbol(buffer & 0x3f);
   }
   int write_position = input_length / 3 * 4;
-  switch (input_length % 3){
-    case 1:
-      output[write_position++] = get_alphabet_symbol((uint8_t)input[input_length-1] >> 2);
-      output[write_position++] = get_alphabet_symbol(((uint8_t)input[input_length-1] << 4) & 0x3f);
-      output[write_position++] = '=';
-      output[write_position++] = '=';
-      break;
-    case 2:
-      output[write_position++] = get_alphabet_symbol(((uint8_t)input[input_length-2]) >> 2);
-      output[write_position++] = get_alphabet_symbol((((uint8_t)input[input_length-2]) << 4) & 0x3f | (((uint8_t)input[input_length-1]) >> 4) & 0x3f);
-      output[write_position++] = get_alphabet_symbol((((uint8_t)input[input_length-1]) << 2) & 0x3f);      
-      output[write_position++] = '=';
-      break;
-    default:
-      break;
-    }
+  switch (input_length % 3) {
+  case 1:
+    output[write_position++] =
+        get_alphabet_symbol((uint8_t)input[input_length - 1] >> 2);
+    output[write_position++] =
+        get_alphabet_symbol(((uint8_t)input[input_length - 1] << 4) & 0x3f);
+    output[write_position++] = '=';
+    output[write_position++] = '=';
+    break;
+  case 2:
+    output[write_position++] =
+        get_alphabet_symbol(((uint8_t)input[input_length - 2]) >> 2);
+    output[write_position++] =
+        get_alphabet_symbol((((uint8_t)input[input_length - 2]) << 4) & 0x3f |
+                            (((uint8_t)input[input_length - 1]) >> 4) & 0x3f);
+    output[write_position++] =
+        get_alphabet_symbol((((uint8_t)input[input_length - 1]) << 2) & 0x3f);
+    output[write_position++] = '=';
+    break;
+  default:
+    break;
+  }
   return write_position;
 }
 
 int decode(const char *input, uint32_t input_length, char *output) {
-  while(input[input_length-1] == '=') { input_length -= 1;}
-  for (int read_position = 0; read_position < input_length - 3; read_position += 4) {
+  while (input[input_length - 1] == '=') {
+    input_length -= 1;
+  }
+  for (int read_position = 0; read_position + 3 < input_length;
+       read_position += 4) {
     uint32_t buffer = 0;
     buffer |= get_alphabet_index(input[read_position]) << 18;
-    buffer |= get_alphabet_index(input[read_position+1]) << 12;
-    buffer |= get_alphabet_index(input[read_position+2]) << 6;
-    buffer |= get_alphabet_index(input[read_position+3]);
+    buffer |= get_alphabet_index(input[read_position + 1]) << 12;
+    buffer |= get_alphabet_index(input[read_position + 2]) << 6;
+    buffer |= get_alphabet_index(input[read_position + 3]);
 
     int write_position = read_position / 4 * 3;
     output[write_position++] = (uint8_t)(buffer >> 16);
@@ -80,15 +90,22 @@ int decode(const char *input, uint32_t input_length, char *output) {
     output[write_position++] = (uint8_t)buffer;
   }
   int write_position = input_length / 4 * 3;
-  switch (input_length % 4){
-    case 2:
-      output[write_position++] = (get_alphabet_index(input[input_length-2]) << 2) + (get_alphabet_index(input[input_length-1]) >> 4);
-      break;
-    case 3:
-      output[write_position++] = (get_alphabet_index(input[input_length-3]) << 2) + (get_alphabet_index(input[input_length-2]) >> 4);
-      output[write_position++] = (get_alphabet_index(input[input_length-2]) << 4) + (get_alphabet_index(input[input_length-1]) >> 2);
+  switch (input_length % 4) {
+  case 2:
+    output[write_position++] =
+        (get_alphabet_index(input[input_length - 2]) << 2) +
+        (get_alphabet_index(input[input_length - 1]) >> 4);
     break;
-    default: break;
+  case 3:
+    output[write_position++] =
+        (get_alphabet_index(input[input_length - 3]) << 2) +
+        (get_alphabet_index(input[input_length - 2]) >> 4);
+    output[write_position++] =
+        (get_alphabet_index(input[input_length - 2]) << 4) +
+        (get_alphabet_index(input[input_length - 1]) >> 2);
+    break;
+  default:
+    break;
   }
   return write_position;
 }
