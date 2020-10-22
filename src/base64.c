@@ -76,13 +76,34 @@ int decode(const char *input, uint32_t input_length, char *output) {
   while (input[input_length - 1] == '=') {
     input_length -= 1;
   }
+  uint8_t i;
   for (int read_position = 0; read_position + 3 < input_length;
        read_position += 4) {
     uint32_t buffer = 0;
-    buffer |= get_alphabet_index(input[read_position]) << 18;
-    buffer |= get_alphabet_index(input[read_position + 1]) << 12;
-    buffer |= get_alphabet_index(input[read_position + 2]) << 6;
-    buffer |= get_alphabet_index(input[read_position + 3]);
+
+    i = get_alphabet_index(input[read_position]);
+    if (i == (uint8_t)-1) {
+      return -1;
+    }
+    buffer |= i << 18;
+
+    i = get_alphabet_index(input[read_position + 1]);
+    if (i == (uint8_t)-1) {
+      return -1;
+    }
+    buffer |= i << 12;
+
+    i = get_alphabet_index(input[read_position + 2]);
+    if (i == (uint8_t)-1) {
+      return -1;
+    }
+    buffer |= i << 6;
+
+    i = get_alphabet_index(input[read_position + 3]);
+    if (i == (uint8_t)-1) {
+      return -1;
+    }
+    buffer |= i;
 
     int write_position = read_position / 4 * 3;
     output[write_position++] = (uint8_t)(buffer >> 16);
@@ -92,17 +113,37 @@ int decode(const char *input, uint32_t input_length, char *output) {
   int write_position = input_length / 4 * 3;
   switch (input_length % 4) {
   case 2:
-    output[write_position++] =
-        (get_alphabet_index(input[input_length - 2]) << 2) +
-        (get_alphabet_index(input[input_length - 1]) >> 4);
+    i = get_alphabet_index(input[input_length - 2]);
+    if (i == (uint8_t)-1) {
+      return -1;
+    }
+    output[write_position] = i << 2;
+
+    i = get_alphabet_index(input[input_length - 1]);
+    if (i == (uint8_t)-1) {
+      return -1;
+    }
+    output[write_position++] |= i >> 4;
     break;
   case 3:
-    output[write_position++] =
-        (get_alphabet_index(input[input_length - 3]) << 2) +
-        (get_alphabet_index(input[input_length - 2]) >> 4);
-    output[write_position++] =
-        (get_alphabet_index(input[input_length - 2]) << 4) +
-        (get_alphabet_index(input[input_length - 1]) >> 2);
+    i = get_alphabet_index(input[input_length - 3]);
+    if (i == (uint8_t)-1) {
+      return -1;
+    }
+    output[write_position] = i << 2;
+
+    i = get_alphabet_index(input[input_length - 2]);
+    if (i == (uint8_t)-1) {
+      return -1;
+    }
+    output[write_position++] |= i >> 4;
+
+    output[write_position] = i << 4;
+    i = get_alphabet_index(input[input_length - 1]);
+    if (i == (uint8_t)-1) {
+      return -1;
+    }
+    output[write_position++] |= i >> 2;
     break;
   default:
     break;
