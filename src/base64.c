@@ -112,6 +112,10 @@ int decode(const char *input, uint32_t input_length, char *output) {
   }
   int write_position = input_length / 4 * 3;
   switch (input_length % 4) {
+  case 0:
+    break;
+  case 1:
+    return -1;
   case 2:
     i = get_alphabet_index(input[input_length - 2]);
     if (i == (uint8_t)-1) {
@@ -144,8 +148,6 @@ int decode(const char *input, uint32_t input_length, char *output) {
       return -1;
     }
     output[write_position++] |= i >> 2;
-    break;
-  default:
     break;
   }
   return write_position;
