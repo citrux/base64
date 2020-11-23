@@ -12,6 +12,12 @@ const uint8_t rev_alphabet[128] = {
     -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
     43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1};
 
+char error_message[100] = {};
+
+const char* base64_strerror() {
+  return error_message;
+}
+
 char get_alphabet_symbol(uint8_t index) {
   if (index > 63) {
     return -1;
