@@ -26,7 +26,7 @@ Then check the [examples](examples).
 
 - [ ] improve code
     - [x] handle errors
-    - [ ] error messages
+    - [x] error messages
     - [ ] write comments (especially, in src/base64.h)
 - [x] add c++ support (extern C)
 - [x] add benchmark
