@@ -17,6 +17,6 @@ if(COMPILE_EXAMPLES)
     target_link_libraries(hex base64)
 
     add_executable(bench examples/bench.c)
-    target_link_libraries(bench base64)
+    target_link_libraries(bench base64 m)
 endif()
 
