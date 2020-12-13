@@ -15,7 +15,7 @@ const uint8_t rev_alphabet[128] = {
 
 char error_message[100] = {};
 
-const char* base64_strerror() {
+const char* base64_error() {
   return error_message;
 }
 
@@ -41,13 +41,13 @@ int8_t get_alphabet_index(char symbol) {
   return rev_alphabet[symbol];
 }
 
-uint32_t get_encoded_length(uint32_t data_len) {
+uint32_t base64_encoded_length(uint32_t data_len) {
   return (data_len + 2) / 3 * 4;
 }
 
-uint32_t get_decoded_length(uint32_t data_len) { return data_len * 3 / 4; }
+uint32_t base64_decoded_length(uint32_t data_len) { return data_len * 3 / 4; }
 
-int encode(const char *input, uint32_t input_length, char *output) {
+int base64_encode(const char *input, uint32_t input_length, char *output) {
   for (int read_position = 0; read_position + 2 < input_length;
        read_position += 3) {
     uint32_t buffer = 0;
@@ -87,7 +87,7 @@ int encode(const char *input, uint32_t input_length, char *output) {
   return write_position;
 }
 
-int decode(const char *input, uint32_t input_length, char *output) {
+int base64_decode(const char *input, uint32_t input_length, char *output) {
   while (input[input_length - 1] == '=') {
     input_length -= 1;
   }

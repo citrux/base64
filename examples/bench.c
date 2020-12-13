@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[]) {
   for (int input_length = 131072; input_length < 10000000; input_length *= 2) {
-    uint32_t output_length = get_encoded_length(input_length);
+    uint32_t output_length = base64_encoded_length(input_length);
 
     char *input = malloc(input_length);
     char *output = malloc(output_length);
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
       fread(input, 1, input_length, fd);
 
       double start = (double)clock() / CLOCKS_PER_SEC;
-      if (encode(input, input_length, output) == -1) {
+      if (base64_encode(input, input_length, output) == -1) {
         puts("encode error");
       }
       double end = (double)clock() / CLOCKS_PER_SEC;
@@ -50,8 +50,9 @@ int main(int argc, char *argv[]) {
         right_pad += 1;
       }
       start = (double)clock() / CLOCKS_PER_SEC;
-      if (decode(output, output_length, check) == -1) {
-        puts("decode error");
+      if (base64_decode(output, output_length, check) == -1) {
+        puts("decode error:");
+        puts(base64_error());
       }
       end = (double)clock() / CLOCKS_PER_SEC;
 
