@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdint.h>
 
 #include "base64.h"
 
@@ -32,9 +33,7 @@ int main(int argc, char *argv[]) {
       fread(input, 1, input_length, fd);
 
       double start = (double)clock() / CLOCKS_PER_SEC;
-      if (base64_encode(input, input_length, output) == -1) {
-        puts("encode error");
-      }
+      base64_encode(input, input_length, output);
       double end = (double)clock() / CLOCKS_PER_SEC;
       double dt = (end - start) * 1000;
       if (dt < encode_min) {
@@ -50,10 +49,7 @@ int main(int argc, char *argv[]) {
         right_pad += 1;
       }
       start = (double)clock() / CLOCKS_PER_SEC;
-      if (base64_decode(output, output_length, check) == -1) {
-        puts("decode error:");
-        puts(base64_error());
-      }
+      base64_decode(output, output_length, check);
       end = (double)clock() / CLOCKS_PER_SEC;
 
       dt = (end - start) * 1000;
