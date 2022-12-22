@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   size_t error_pos = base64_check(encoded, strlen(encoded));
   if (error_pos != strlen(encoded)) {
     puts("Decoding failed!");
-    printf("Invalid character in position %d: %c\n", error_pos, encoded[error_pos]);
+    printf("Invalid character in position %ld: %c\n", error_pos, encoded[error_pos]);
     exit(1);
   }
   // 2. Get length of output buffer
