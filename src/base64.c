@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <stdint.h>
 #include "base64.h"
 
 const char alphabet[64] =
