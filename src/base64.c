@@ -38,7 +38,7 @@ size_t base64_check(const char *input, size_t input_length) {
 
 size_t base64_encode(const char *input, size_t input_length, char *output) {
   if (input == NULL) {
-    return (data_len + 2) / 3 * 4;
+    return (input_length + 2) / 3 * 4;
   }
 
   for (int read_position = 0; read_position + 2 < input_length;
@@ -82,7 +82,7 @@ size_t base64_encode(const char *input, size_t input_length, char *output) {
 
 size_t base64_decode(const char *input, size_t input_length, char *output) {
   if (input == NULL) {
-    return data_len * 3 / 4;
+    return input_length * 3 / 4;
   }
 
   while (input[input_length - 1] == '=') {
