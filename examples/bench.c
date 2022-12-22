@@ -7,8 +7,8 @@
 #include "base64.h"
 
 int main(int argc, char *argv[]) {
-  for (int input_length = 131072; input_length < 10000000; input_length *= 2) {
-    uint32_t output_length = base64_encoded_length(input_length);
+  for (size_t input_length = 131072; input_length < 10000000; input_length *= 2) {
+    size_t output_length = base64_encode(NULL, input_length, NULL);
 
     char *input = malloc(input_length);
     char *output = malloc(output_length);

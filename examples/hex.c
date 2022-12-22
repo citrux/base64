@@ -23,26 +23,16 @@ int main(int argc, char *argv[]) {
     input[i] = strtol(x, NULL, 16);
   }
 
-  int out_len = base64_encoded_length(strlen(input));
+  int out_len = base64_encode(input, strlen(input), NULL);
   printf("input length: %lu, encoded length: %d\n", strlen(input), out_len);
   char *output = calloc(out_len + 1, sizeof(char));
-  memset(output, 0, out_len + 1);
 
-  if (base64_encode(input, strlen(input), output) == -1) {
-    puts("Encoding failed!");
-    exit(1);
-  }
+  base64_encode(input, strlen(input), output);
   puts(output);
-  int out1_len = base64_decoded_length(out_len);
+  int out1_len = base64_decode(output, out_len, NULL);
   char *output1 = calloc(out1_len + 1, sizeof(char));
-  memset(output1, 0, out1_len + 1);
 
-  out1_len = base64_decode(output, strlen(output), output1);
-  if (out1_len == -1) {
-    puts("Decoding failed!");
-    puts(base64_error());
-    exit(1);
-  }
+  base64_decode(output, out_len, output1);
   printf("decoded length: %d\n", out1_len);
 
   for (int i = 0; i < out1_len; ++i) {

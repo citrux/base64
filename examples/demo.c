@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   char *input = "Text to be encoded";
 
   // 1. Get length of output buffer
-  int enc_len = base64_encoded_length(strlen(input));
+  int enc_len = base64_encode(input, strlen(input), NULL);
 
   // 2. Allocate output buffer (+1 for '\0' at the end)
   char *encoded = calloc(enc_len + 1, sizeof(char));
@@ -21,22 +21,22 @@ int main(int argc, char *argv[]) {
 
 
   // Decoding
-  // 1. Get length of output buffer
-  int dec_len = base64_decoded_length(strlen(encoded));
+  // 1. Check input
+  size_t error_pos = base64_check(encoded, strlen(encoded));
+  if (error_pos != strlen(encoded)) {
+    puts("Decoding failed!");
+    printf("Invalid character in position %d: %c\n", error_pos, encoded[error_pos]);
+    exit(1);
+  }
+  // 2. Get length of output buffer
+  int dec_len = base64_decode(encoded, strlen(encoded), NULL);
   
-  // 2. Allocate output buffer (+1 for '\0' at the end)
+  // 3. Allocate output buffer (+1 for '\0' at the end)
   char *decoded = calloc(dec_len + 1, sizeof(char));
   memset(decoded, 0, dec_len + 1);
 
-  // 3. Decode
+  // 4. Decode
   dec_len = base64_decode(encoded, strlen(encoded), decoded);
-  
-  // 4. Check decode errors
-  if (dec_len == -1) {
-    puts("Decoding failed!");
-    puts(base64_error());
-    exit(1);
-  }
 
   assert(strcmp(input, decoded) == 0);
 
