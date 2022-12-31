@@ -21,45 +21,36 @@ SOFTWARE.
 */
 #pragma once
 
-#include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * Calculate length of encoded data from input length
+ *
+ * If output is NULL, just returns expected length of output buffer
+ * Otherwise, fill output with encoded data
+ *
  */
-uint32_t base64_encoded_length(uint32_t data_len);
+size_t base64_encode(const char *input, size_t input_length, char *output);
 
 /**
- * Calculate length of decoded data from input length
+ *
+ * If output is NULL, just returns expected length of output buffer
+ * Otherwise, fill output with decoded data
+ *
  */
-uint32_t base64_decoded_length(uint32_t data_len);
+size_t base64_decode(const char *input, size_t input_length, char *output);
 
 /**
- * Fill output with encoded input
  *
- * Output should be at least base64_encoded_length(input) bytes long
+ * Check input before decoding
+ * Returns position of error character or input_length if no error found
  *
- * Returns number of bytes written to output
  */
-int base64_encode(const char *input, uint32_t input_length, char *output);
+size_t base64_check(const char *input, size_t input_length);
 
-/**
- * Fill output with decodet input
- *
- * Output should be at least base64_decoded_length(input) bytes long
- *
- * Returns number of bytes written to output, or -1 on error.
- * For error message use base64_error()
- */
-int base64_decode(const char *input, uint32_t input_length, char *output);
-
-/**
- * Returns last error message
- */
-const char* base64_error();
 
 #ifdef __cplusplus
 }

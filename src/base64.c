@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <stdint.h>
 #include "base64.h"
 
 const char alphabet[64] =
@@ -12,20 +12,6 @@ const uint8_t rev_alphabet[128] = {
     11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1,
     -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
     43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1};
-
-char error_message[100] = {};
-
-const char* base64_error() {
-  return error_message;
-}
-
-int check_error(const char *input, int i) {
-  if (i == (uint8_t)-1) {
-      snprintf(error_message, 100, "Invalid character at position %d: '%c'", i, input[i]);
-      return 1;
-  }
-  return 0;
-}
 
 char get_alphabet_symbol(uint8_t index) {
   if (index > 63) {
@@ -41,13 +27,20 @@ int8_t get_alphabet_index(char symbol) {
   return rev_alphabet[symbol];
 }
 
-uint32_t base64_encoded_length(uint32_t data_len) {
-  return (data_len + 2) / 3 * 4;
+size_t base64_check(const char *input, size_t input_length) {
+  for (size_t i = 0; i < input_length; ++i) {
+    if (get_alphabet_index(input[i]) == -1) {
+      return i;
+    }
+  }
+  return input_length;
 }
 
-uint32_t base64_decoded_length(uint32_t data_len) { return data_len * 3 / 4; }
+size_t base64_encode(const char *input, size_t input_length, char *output) {
+  if (output == NULL) {
+    return (input_length + 2) / 3 * 4;
+  }
 
-int base64_encode(const char *input, uint32_t input_length, char *output) {
   for (int read_position = 0; read_position + 2 < input_length;
        read_position += 3) {
     uint32_t buffer = 0;
@@ -87,38 +80,23 @@ int base64_encode(const char *input, uint32_t input_length, char *output) {
   return write_position;
 }
 
-int base64_decode(const char *input, uint32_t input_length, char *output) {
+size_t base64_decode(const char *input, size_t input_length, char *output) {
   while (input[input_length - 1] == '=') {
     input_length -= 1;
   }
-  uint8_t i;
+
+  if (output == NULL) {
+    return input_length * 3 / 4;
+  }
+
   for (int read_position = 0; read_position + 3 < input_length;
        read_position += 4) {
     uint32_t buffer = 0;
 
-    i = get_alphabet_index(input[read_position]);
-    if (check_error(input, i)) {
-      return -1;
-    }
-    buffer |= i << 18;
-
-    i = get_alphabet_index(input[read_position + 1]);
-    if (check_error(input, i)) {
-      return -1;
-    }
-    buffer |= i << 12;
-
-    i = get_alphabet_index(input[read_position + 2]);
-    if (check_error(input, i)) {
-      return -1;
-    }
-    buffer |= i << 6;
-
-    i = get_alphabet_index(input[read_position + 3]);
-    if (check_error(input, i)) {
-      return -1;
-    }
-    buffer |= i;
+    buffer |= get_alphabet_index(input[read_position]) << 18;
+    buffer |= get_alphabet_index(input[read_position + 1]) << 12;
+    buffer |= get_alphabet_index(input[read_position + 2]) << 6;
+    buffer |= get_alphabet_index(input[read_position + 3]);
 
     int write_position = read_position / 4 * 3;
     output[write_position++] = (uint8_t)(buffer >> 16);
@@ -132,37 +110,14 @@ int base64_decode(const char *input, uint32_t input_length, char *output) {
   case 1:
     return -1;
   case 2:
-    i = get_alphabet_index(input[input_length - 2]);
-    if (check_error(input, i)) {
-      return -1;
-    }
-    output[write_position] = i << 2;
-
-    i = get_alphabet_index(input[input_length - 1]);
-    if (check_error(input, i)) {
-      return -1;
-    }
-    output[write_position++] |= i >> 4;
+    output[write_position] = get_alphabet_index(input[input_length - 2]) << 2;
+    output[write_position++] |= get_alphabet_index(input[input_length - 1]) >> 4;
     break;
   case 3:
-    i = get_alphabet_index(input[input_length - 3]);
-    if (check_error(input, i)) {
-      return -1;
-    }
-    output[write_position] = i << 2;
-
-    i = get_alphabet_index(input[input_length - 2]);
-    if (check_error(input, i)) {
-      return -1;
-    }
-    output[write_position++] |= i >> 4;
-
-    output[write_position] = i << 4;
-    i = get_alphabet_index(input[input_length - 1]);
-    if (check_error(input, i)) {
-      return -1;
-    }
-    output[write_position++] |= i >> 2;
+    output[write_position] = get_alphabet_index(input[input_length - 3]) << 2;
+    output[write_position++] |= get_alphabet_index(input[input_length - 2]) >> 4;
+    output[write_position] = get_alphabet_index(input[input_length - 2]) << 4;
+    output[write_position++] |= get_alphabet_index(input[input_length - 1]) >> 2;
     break;
   }
   return write_position;
