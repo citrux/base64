@@ -23,10 +23,10 @@ target_link_libraries(awesome_name base64) # link with base64
 Then you can use it in this way:
 
 ```c
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #include "base64.h"
 
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   }
   // 2. Get length of output buffer
   int dec_len = base64_decode(encoded, strlen(encoded), NULL);
-  
+
   // 3. Allocate output buffer (+1 for '\0' at the end)
   char *decoded = calloc(dec_len + 1, sizeof(char));
 
