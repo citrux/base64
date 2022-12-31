@@ -31,13 +31,13 @@ size_t base64_check(const char *input, size_t input_length) {
   for (size_t i = 0; i < input_length; ++i) {
     if (get_alphabet_index(input[i]) == -1) {
       return i;
-    } 
+    }
   }
   return input_length;
 }
 
 size_t base64_encode(const char *input, size_t input_length, char *output) {
-  if (input == NULL) {
+  if (output == NULL) {
     return (input_length + 2) / 3 * 4;
   }
 
@@ -81,13 +81,14 @@ size_t base64_encode(const char *input, size_t input_length, char *output) {
 }
 
 size_t base64_decode(const char *input, size_t input_length, char *output) {
-  if (input == NULL) {
-    return input_length * 3 / 4;
-  }
-
   while (input[input_length - 1] == '=') {
     input_length -= 1;
   }
+
+  if (output == NULL) {
+    return input_length * 3 / 4;
+  }
+
   for (int read_position = 0; read_position + 3 < input_length;
        read_position += 4) {
     uint32_t buffer = 0;

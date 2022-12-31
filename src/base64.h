@@ -29,7 +29,7 @@ extern "C" {
 
 /**
  *
- * If output is NULL, just returns expected length of output buffer 
+ * If output is NULL, just returns expected length of output buffer
  * Otherwise, fill output with encoded data
  *
  */
@@ -37,7 +37,7 @@ size_t base64_encode(const char *input, size_t input_length, char *output);
 
 /**
  *
- * If output is NULL, just returns expected length of output buffer 
+ * If output is NULL, just returns expected length of output buffer
  * Otherwise, fill output with decoded data
  *
  */
